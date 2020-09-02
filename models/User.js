@@ -40,17 +40,23 @@ const UserSchema = new mongoose.Schema({
 })
 
 const saltRounds = 10;
-UserSchema.pre('save', function (next) { // executed before the document is saved
-    const document = this;
-    if (document.isNew || document.isModified('password')) { // Check if document is new or a new password has been set
+// Use pre('validate') instead of pre('save') to set the value for the required field
+// https://stackoverflow.com/questions/30141492/mongoose-presave-does-not-trigger
+
+// function below is executed before the document is validated and saved
+UserSchema.pre('validate', function (next) {
+    const document = this
+    // Check if document is new or a new password has been set
+    if (document.isNew || document.isModified('password'))
         bcrypt.hash(document.password, saltRounds)
             .then((hashedPassword) => {
                 document.password = hashedPassword;
                 next();
             })
             .catch(next)
-    } else next()
+    else next()
 })
+// The hook above is only triggered when new document is added, NOT when it is updated via findOneAndUpdate
 
 UserSchema.methods.isCorrectPassword = (plainPassword) => bcrypt.compare(plainPassword, this.password)
 // Either return a resolved promise with the boolean value (true if the pass does match and vice versa)
