@@ -2,6 +2,8 @@ const express = require('express');
 const mongoose = require('mongoose');
 const createError = require('http-errors')
 
+const seedDB = require('./seedDB')
+
 require('dotenv').config();
 
 const app = express();
@@ -13,6 +15,7 @@ const connection = mongoose.connection;
 connection.once('open', () => {
   console.log("MongoDB database connection established successfully");
 })
+seedDB()
 
 app.use(express.json());
 app.use((req, res, next) => { // make "/path" and "/path/" to be the same
@@ -74,5 +77,5 @@ function logErrors(err, req, res, next) {
 
 const port = process.env.PORT || 5000;
 app.listen(port, () => {
-  console.log(`Server is running on port: ${port}`);
+  console.log(`API server is running on port: ${port}`);
 });
