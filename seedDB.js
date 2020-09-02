@@ -83,14 +83,14 @@ module.exports = function seedDB() {
     })
 
     assistants.forEach((assistant) => {
-        assistant = { role: 'assistant', ...assistant }
+        assistant.role= 'assistant'
         User.create(assistant)
     })
 
     trainers.forEach((trainer) => {
         // Extract user's most basic data
         let user = (({ name, email, password, phone, dob }) => ({ name, email, password, phone, dob }))(trainer)
-        user = { role: 'trainer', ...user } // add the role
+        user.role = 'trainer' // add the role
 
         // Extract the trainer info
         let trainerInfo = (({ type, working_place, assigned_sessions }) => ({ type, working_place, assigned_sessions }))(trainer)
@@ -98,7 +98,7 @@ module.exports = function seedDB() {
         User.create(user) // add user to DB
             .then((newUser) => {
                 let { _id: userID } = newUser // take the _id of the user just added to the DB
-                trainerInfo = { basic_info: userID, ...trainerInfo } // link the trainer to the user
+                trainerInfo.basic_info = userID // link the trainer to the user
                 Trainer.create(trainerInfo)
                     .then(({ _id: newTrainerID }) => {
                         newUser.person_id = newTrainerID
@@ -110,7 +110,7 @@ module.exports = function seedDB() {
     trainees.forEach((trainee) => {
         // Extract user's most basic data
         let user = (({ name, email, password, phone, dob }) => ({ name, email, password, phone, dob }))(trainee)
-        user = { role: 'trainee', ...user } // add the role
+        user.role = 'trainee' // add the role
 
         // Extract the trainee info
         traineeInfo = (({ education, department, assigned_programs }) => ({ education, department, assigned_programs }))(trainee)
@@ -118,7 +118,7 @@ module.exports = function seedDB() {
         User.create(user) // add user to DB
             .then((newUser) => {
                 let { _id: userID } = newUser // take the _id of the user just added to the DB
-                traineeInfo = { basic_info: userID, ...traineeInfo } // link the trainer to the user
+                traineeInfo.basic_info = userID // link the trainer to the user
                 Trainee.create(traineeInfo)
                     .then(({ _id: newTraineeID }) => {
                         newUser.person_id = newTraineeID
