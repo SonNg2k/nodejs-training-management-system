@@ -2,7 +2,7 @@ const mongoose = require('mongoose')
 const { schema } = require('./Program')
 
 const SessionSchema = new mongoose.Schema({
-    programID = {
+    programID: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Program',
         required: true
