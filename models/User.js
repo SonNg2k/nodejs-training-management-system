@@ -47,19 +47,27 @@ const saltRounds = 10;
 UserSchema.pre('validate', function (next) {
     const document = this
     // Check if document is new or a new password has been set
-    if (document.isNew || document.isModified('password'))
-        bcrypt.hash(document.password, saltRounds)
-            .then((hashedPassword) => {
-                document.password = hashedPassword;
-                next();
-            })
-            .catch(next)
+    if (document.isNew || document.isModified('password')) secureUserPass(document, next)
     else next()
 })
 // The hook above is only triggered when new document is added, NOT when it is updated via findOneAndUpdate
 
+UserSchema.pre('findOneAndUpdate', function (next) {
+    const document = this._update
+    secureUserPass(document, next)
+})
+
 UserSchema.methods.isCorrectPassword = (plainPassword) => bcrypt.compare(plainPassword, this.password)
 // Either return a resolved promise with the boolean value (true if the pass does match and vice versa)
 // or a rejected promise with an Error
+
+function secureUserPass(document, next) {
+    bcrypt.hash(document.password, saltRounds)
+        .then((hashedPassword) => {
+            document.password = hashedPassword;
+            next();
+        })
+        .catch(next)
+}
 
 module.exports = mongoose.model('User', UserSchema)
