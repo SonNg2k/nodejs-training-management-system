@@ -54,7 +54,8 @@ UserSchema.pre('validate', function (next) {
 
 UserSchema.pre('findOneAndUpdate', function (next) {
     const document = this._update
-    secureUserPass(document, next)
+    if (document.password) secureUserPass(document, next)
+    else next()
 })
 
 UserSchema.methods.isCorrectPassword = (plainPassword) => bcrypt.compare(plainPassword, this.password)
