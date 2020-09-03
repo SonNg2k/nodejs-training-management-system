@@ -3,7 +3,7 @@ const router = require('express').Router(),
     Category = require('../models/Category')
 
 router.get('/', (_req, res, next) => {
-    Category.find({}).select('-__v').lean().exec()
+    Category.find({}).select('-__v').lean()
         .then((data) => res.status(200).json(data))
         .catch(next)
 })

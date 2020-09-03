@@ -3,7 +3,7 @@ const router = require('express').Router(),
     User = require('../models/User')
 
 router.get('/', (_req, res, next) => {
-    User.find({ role: 'assistant' }).select('-role -person_id -password -__v').lean().exec()
+    User.find({ role: 'assistant' }).select('-role -person_id -password -__v').lean()
         .then((data) => res.status(200).json(data))
         .catch(next)
 })
