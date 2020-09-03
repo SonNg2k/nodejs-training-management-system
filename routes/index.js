@@ -1,8 +1,13 @@
-var router = require("express").Router()
+const router = require("express").Router(),
+    Session = require('../models/Session')
 
 // Verify login credentials
 router.post("/")
-router.get('/sessions')
+router.get('/sessions', (_req, res, next) =>
+    Session.find({}).select('_id name').lean()
+    .then((data) => res.status(200).json(data))
+    .catch(next)
+)
 
 // Assemble other routes...
 router.use('/assistants', require('./assistants'))
