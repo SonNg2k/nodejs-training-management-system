@@ -15,7 +15,7 @@ const connection = mongoose.connection;
 connection.once('open', () => {
   console.log("MongoDB database connection established successfully");
 })
-seedDB()
+// seedDB()
 
 app.use(express.json());
 app.use((req, res, next) => { // make "/path" and "/path/" to be the same
@@ -28,11 +28,8 @@ app.use((req, res, next) => { // make "/path" and "/path/" to be the same
 app.disable('x-powered-by'); // NOT reveal the technology of server (Express.js) to hackers
 
 //requiring routes
-// var routes = require("./routes")
-// app.use("/", routes);
-app.get("/category-management", () => {
-  console.log("React made request")
-})
+var routes = require('./routes')
+app.use("/", routes);
 app.all("*", (req, _res, next) => {
   next(new createError.NotFound(`Page not found. ${req.ip} tried to reach ${req.originalUrl}`))
 })
@@ -48,31 +45,37 @@ process.on("unhandledRejection", (reason, promise) => {
 app.use(logErrors);
 app.use(errorHandler);
 
-function errorHandler(err, req, res, _next) {
-  /*  If you call next() with an error after you have started writing the response (for example, if you
-   encounter an error while streaming the response to the client) the Express default error handler
-   closes the connection and fails the request. */
-  /* So when you add a custom error handler, you must delegate to the default Express error handler, when
-  the headers have already been sent to the client: */
-  if (res.headersSent) return next(err); // default error handler can get triggered if you call next()
-  // with an error in your code more than once, even if custom error handling middleware is in place.
-
-  /*  422 Unprocessable Entity: the server understands the content type of the request entity, and the
- syntax of the request entity is correct, but it was unable to process the contained instructions.
- The server understands what you're trying to do; and it understands the data that you're submitting; it
- simply won't let that data be processed.
- For example: a user is sending a String to an API end point that expects a String, but the server
- couldn't process it because the string contains nothing or several unacceptable characters, etc.*/
-
-  res.status(err.statusCode || 500)
-  // http-errors: mirroring statusCode for general compatibility
-}
-
-function logErrors(err, req, res, next) {
+function logErrors(err, _req, _res, next) {
   /* Basic console.log will not go through long and complex object, and may
   decide to just print [Object] instead. */
   console.dir(err, { depth: null }); // depth: null allows console.dir() to print mutiple objects at once
   next(err)
+}
+
+function errorHandler(err, _req, res, next) {
+  if (res.headersSent) return next(err);
+
+  const dupKeyErrMsg = { // error msg for duplicate key in DB
+    users: 'There is already a user with this email',
+    categories: 'The category has already exited',
+    programs: 'The program name has already exited'
+  }
+
+  // Loop through each key of the object
+  // for each key, check if
+  let { code, message: errMsg } = err
+
+  if (code === 11000) { // MongoDB dup key error
+    Object.keys(dupKeyErrMsg).forEach((collection) => {
+      if (errMsg.includes(collection)) errMsg = dupKeyErrMsg[collection]
+    })
+    err = createError.UnprocessableEntity(errMsg)
+  }
+
+  if (!err.statusCode) err = createError.InternalServerError('Unknown error, sorry')
+  // All errors are http errors with status code and message
+  let { statusCode, message } = err
+  res.status(statusCode).json(message)
 }
 
 const port = process.env.PORT || 5000;
