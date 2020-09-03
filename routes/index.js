@@ -1,15 +1,14 @@
 var router = require("express").Router()
 
 // Verify login credentials
-router.post("")
+router.post("/")
+router.get('/sessions')
 
 // Assemble other routes...
-router.use("/assistant-management", require("./"))
-router.use("/trainer-management", require("./"))
-router.use("/trainee-management", require("./"))
-router.use("/category-management", require("./"))
-router.use("/program-management", require("./"))
-router.use("/trainer", require("./"))
-router.use("/trainee", require("./"))
+router.use('/assistants', require('./assistants'))
+router.use('/trainers', require('./trainers'))
+router.use('/trainees', require('./trainees'))
+router.use('/categories', require('./categories'))
+router.use('/programs', require('./programs'))
 
 module.exports = router
