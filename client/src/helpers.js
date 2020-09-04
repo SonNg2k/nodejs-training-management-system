@@ -1,5 +1,6 @@
 import React from 'react'
 import { TooltipText } from './components/myReusable'
+import axios from 'axios'
 
 export function rowCssStyle(markedAs) {
     if (markedAs === 'just added') return 'added-row-background'
@@ -7,7 +8,7 @@ export function rowCssStyle(markedAs) {
     if (!markedAs) return ''
 }
 
-export function handleSubmit (e, formContext) { // handle submit event triggered by any form
+export function handleSubmit(e, formContext) { // handle submit event triggered by any form
     const form = e.currentTarget;
     e.preventDefault();
     e.stopPropagation();
@@ -23,8 +24,6 @@ export function handleSubmit (e, formContext) { // handle submit event triggered
 export function friendlyData(rawData, notation) { // used to make friendly column names and table cell data
     if (!rawData) return ''
     if (Array.isArray(rawData) && rawData.length === 0) return ''
-    // Translate Date object to friendly date string...
-    if (rawData instanceof Date) return rawData.toDateString().slice(4)
 
     // Make schema-based columns names easier to read...
     if (rawData === 'dob') return "day of birth"
@@ -33,6 +32,8 @@ export function friendlyData(rawData, notation) { // used to make friendly colum
     if (rawData === 'assigned_programs') return "assigned training programs"
     if (rawData === 'sessions') return 'sessions for the program'
 
+    if (notation === 'dob') return rawData = new Date(rawData).toDateString().slice(4)
+    if (notation === 'category') return rawData.name
     // Create tooltip if raw data is an array of objects
     // rawData must be a list of sessions/programs (each one represented as an object)
     if (['assigned_sessions', 'assigned_programs', 'sessions'].includes(notation)) {
@@ -46,20 +47,55 @@ export function friendlyData(rawData, notation) { // used to make friendly colum
     return rawData
 }
 
-export function objIsEmpty(obj) { // {a: null, b: '', c: []}
-    if (!obj) return true
-    return !Object.values(obj).some(x => {
-        if (Array.isArray(x)) {
-            if (x.length > 0) return true
-            if (x.length === 0) return false
-        }
-
-        if (x !== null && x !== '') return true
-        if (x === null || x === '') return false
-    })
-}
-
 export function findThingToManage(urlPath) {
     // urlPath looks like this: /assistant-management, /trainer-management, etc.
     return urlPath.split("-")[0].split("/")[1]
+}
+
+export function addDataToTable(rowData, crudContext) {
+    // Send data to server.
+    // On success, add data to the table --> close the modal --> alert success
+    // On failure, alert failure
+    let cloneData = crudContext.state.tableData
+    rowData.markedAs = "just added"
+    cloneData.unshift(rowData)
+    crudContext.setState({ tableData: cloneData, show: false, alertShow: true })
+}
+
+export function editRowInTable(newRowData, crudContext) {
+    let cloneData = crudContext.state.tableData
+    newRowData.markedAs = "just edited"
+    cloneData[crudContext.state.editRowPos] = newRowData
+    crudContext.setState({ tableData: cloneData, show: false, alertShow: true })
+}
+
+export function deleteRowInTable(crudContext) {
+    let cloneData = crudContext.state.tableData
+    cloneData.splice(crudContext.state.deleteRowPos, 1)
+    crudContext.setState({ tableData: cloneData, confirmShow: false, alertShow: true })
+}
+
+export async function fetchData(currentPath) {
+    // current path can be one of the following: /assistant-management, /trainer-management, etc.
+    const thingToManage = findThingToManage(currentPath)
+    const urlToFetchData = {
+        assistant: '/assistants',
+        trainer: '/trainers',
+        trainee: '/trainees',
+        category: '/categories',
+        program: '/programs'
+    }
+    return await axios.get(urlToFetchData[thingToManage])
+}
+
+export async function fetchListOf(list) {
+    const urlToFetchList = {
+        sessionList: '/sessions',
+        programList: '/programs'
+    }
+    return await axios.get(urlToFetchList[list])
+}
+
+export async function fetchCategories() { // return a list of category HTML options
+    return await axios.get('/categories')
 }
