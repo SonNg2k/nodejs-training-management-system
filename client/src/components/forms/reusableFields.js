@@ -7,7 +7,8 @@ import "react-datepicker/dist/react-datepicker.css";
 
 export function UserBasicFields({ parentState, onInputChange, btnToShow }) {
 
-    const { name, email, phone, dob } = parentState // extract only the info needed from the parent state
+    let { name, email, phone, dob } = parentState // extract only the info needed from the parent state
+    if (dob !== null) dob = new Date(dob)
     let passHelperText = ""
     if (btnToShow === "editBtn") passHelperText = (
         <Form.Text className="text-muted">
