@@ -78,7 +78,7 @@ function errorHandler(err, _req, res, next) {
   res.status(statusCode).json(message)
 }
 
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 8080;
 app.listen(port, () => {
   console.log(`API server is running on port: ${port}`);
 });
