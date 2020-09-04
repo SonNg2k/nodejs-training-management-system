@@ -62,9 +62,11 @@ const urlToExchangeData = {
 
 export function addDataToTable(rowData, crudContext) {
     const thingToManage = findThingToManage(crudContext.props.match.path)
+    const { tableData } = crudContext.state
+
     axios.post(urlToExchangeData[thingToManage], rowData)
         .then(({ data: { _id } }) => {
-            let cloneData = crudContext.state.tableData
+            let cloneData = tableData
             rowData.markedAs = "just added"
             rowData._id = _id
             cloneData.unshift(rowData)
@@ -73,10 +75,17 @@ export function addDataToTable(rowData, crudContext) {
 }
 
 export function editRowInTable(newRowData, crudContext) {
-    let cloneData = crudContext.state.tableData
-    newRowData.markedAs = "just edited"
-    cloneData[crudContext.state.editRowPos] = newRowData
-    crudContext.setState({ tableData: cloneData, show: false, alertShow: true })
+    const thingToManage = findThingToManage(crudContext.props.match.path)
+    const { tableData, editRowPos } = crudContext.state
+    const _id = tableData[editRowPos]._id
+
+    axios.put(urlToExchangeData[thingToManage] + `/${_id}`, newRowData)
+        .then(() => {
+            let cloneData = tableData
+            newRowData.markedAs = "just edited"
+            cloneData[editRowPos] = newRowData
+            crudContext.setState({ tableData: cloneData, show: false, alertShow: true })
+        })
 }
 
 export function deleteRowInTable(crudContext) {
