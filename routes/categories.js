@@ -11,7 +11,7 @@ router.get('/', (_req, res, next) => {
 router.post('/', (req, res, next) => {
     let { body: category } = req
     Category.create(category)
-        .then(() => res.status(201).json('Operation completed successfully'))
+        .then(({_id: categoryID}) => res.status(201).json({_id: categoryID}))
         .catch(next)
 })
 

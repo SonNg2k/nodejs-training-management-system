@@ -12,7 +12,7 @@ router.post('/', (req, res, next) => {
     let { body: assistant } = req
     assistant.role = 'assistant'
     User.create(assistant)
-        .then(() => res.status(201).json('Operation completed successfully'))
+        .then(({_id: assistantID}) => res.status(201).json({_id: assistantID}))
         .catch(next)
 })
 

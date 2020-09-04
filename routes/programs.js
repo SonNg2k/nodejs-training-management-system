@@ -59,7 +59,7 @@ function addSessionsToDB(programDoc, sessions, res) {
             clearInterval(timeout)
             programDoc.sessions = sessionIDs
             programDoc.save()
-            res.status(200).json('Operation completed successfully')
+            res.status(200).json({_id: programID})
         }
     }, 100)
 }

@@ -37,7 +37,7 @@ router.post('/', (req, res, next) => {
                 .then(({ _id: trainerID }) => {
                     user.person_id = trainerID
                     user.save()
-                    res.status(200).json('Operation completed successfully')
+                    res.status(200).json({_id: trainerID})
                 })
                 .catch((err) => {
                     user.remove() // remove the info associated with the falsy trainer info
