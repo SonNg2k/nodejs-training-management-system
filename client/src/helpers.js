@@ -89,9 +89,16 @@ export function editRowInTable(newRowData, crudContext) {
 }
 
 export function deleteRowInTable(crudContext) {
-    let cloneData = crudContext.state.tableData
-    cloneData.splice(crudContext.state.deleteRowPos, 1)
-    crudContext.setState({ tableData: cloneData, confirmShow: false, alertShow: true })
+    const thingToManage = findThingToManage(crudContext.props.match.path)
+    const { tableData, deleteRowPos } = crudContext.state
+    const _id = tableData[deleteRowPos]._id
+
+    axios.delete(urlToExchangeData[thingToManage] + `/${_id}`)
+        .then(() => {
+            let cloneData = tableData
+            cloneData.splice(deleteRowPos, 1)
+            crudContext.setState({ tableData: cloneData, confirmShow: false, alertShow: true })
+        })
 }
 
 export async function fetchData(currentPath) {
