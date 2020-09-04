@@ -10,10 +10,7 @@ import AssistantUpsert from './forms/AssistantUpsert'
 import TraineerUpsert from './forms/TraineerUpsert'
 import ProgramUpsert from './forms/ProgramUpsert'
 
-import { findThingToManage, objIsEmpty } from '../helpers'
-
-// Import seed data
-import seedData from '../seedData'
+import { findThingToManage, fetchData, addDataToTable, editRowInTable, deleteRowInTable } from '../helpers'
 
 class CrudSection extends React.Component {
     state = {
@@ -23,32 +20,12 @@ class CrudSection extends React.Component {
         editRowPos: null,
         confirmShow: false,
         deleteRowPos: null,
-        tableData: seedData[findThingToManage(this.props.match.path)] // data from server...
+        tableData: []
     }
 
-    addDataToTable = (rowData) => {
-        if (objIsEmpty(rowData)) return this.closeModal()
-        // Send data to server.
-        // On success, add data to the table --> close the modal --> alert success
-        // On failure, alert failure
-        let cloneData = this.state.tableData
-        rowData.markedAs = "just added"
-        cloneData.unshift(rowData)
-        this.setState({ tableData: cloneData, show: false, alertShow: true })
-    }
-
-    editRowInTable = (newRowData) => {
-        if (objIsEmpty(newRowData)) return this.closeModal()
-        let cloneData = this.state.tableData
-        newRowData.markedAs = "just edited"
-        cloneData[this.state.editRowPos] = newRowData
-        this.setState({ tableData: cloneData, show: false, alertShow: true })
-    }
-
-    deleteRowInTable = () => {
-        let cloneData = this.state.tableData
-        cloneData.splice(this.state.deleteRowPos, 1)
-        this.setState({ tableData: cloneData, confirmShow: false, alertShow: true })
+    componentDidMount() {
+        fetchData(this.props.match.path)
+            .then(({ data: tableData }) => this.setState({ tableData: tableData }))
     }
 
     closeAlert = () => this.setState({ alertShow: false })
@@ -112,11 +89,13 @@ class CrudSection extends React.Component {
 
                 <UpsertModal size={modalSize} show={show} title={modalTitle[btnToShow]} closeModal={this.closeModal}>
                     <InnerForm submitBtn={submitBtn} btnToShow={btnToShow} editRowData={editRowData} thingToManage={thingToManage}
-                        closeModal={this.closeModal} addDataToTable={this.addDataToTable} editRowInTable={this.editRowInTable} />
+                        closeModal={this.closeModal}
+                        addDataToTable={(rowData) => addDataToTable(rowData, this)}
+                        editRowInTable={(rowData) => editRowInTable(rowData, this)} />
                 </UpsertModal>
 
                 <DeleteConfirm confirmShow={confirmShow} closeDelConfirm={this.closeDelConfirm}
-                    deleteRowInTable={this.deleteRowInTable} />
+                    deleteRowInTable={() => deleteRowInTable(this)} />
             </div>
         )
     }
