@@ -33,14 +33,14 @@ function RudTable({ thingToManage, tableData, changeEditRowPos, showEditModal, c
 
     const createRows = () => {
         return tableData.map((rowData, rowIndex) =>
-            <tr key={rowIndex} className={rowCssStyle(rowData.markedAs)} >
+            <tr key={rowData._id} className={rowCssStyle(rowData.markedAs)}>
                 <td>{rowIndex + 1}</td>
                 {schemaKeys.map((schemaKey, colIndex) =>
                     <td key={`${rowIndex}-${colIndex}`}>{friendlyData(rowData[schemaKey], schemaKey)}</td>
                 )}
                 <td>
-                    <EditBtn text="Edit" onClick={() => onEditBtnClick(rowIndex)} /> {' '}
-                    <DeleteBtn text="Delete" onClick={() => onDeleteBtnClick(rowIndex)} />
+                    <EditBtn text="Edit" onClick={() => onEditBtnClick(rowIndex)}/>{' '}
+                    <DeleteBtn text="Delete" onClick={() => onDeleteBtnClick(rowIndex)}/>
                 </td>
             </tr>
         )
@@ -58,10 +58,7 @@ function RudTable({ thingToManage, tableData, changeEditRowPos, showEditModal, c
                     <th></th>
                 </tr>
             </thead>
-            <tbody>
-                {/* There is no row if the tableData is empty [] */}
-                {createdRows}
-            </tbody>
+            <tbody>{createdRows}</tbody>
         </Table>
     )
 }
