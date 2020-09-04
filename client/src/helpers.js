@@ -52,14 +52,24 @@ export function findThingToManage(urlPath) {
     return urlPath.split("-")[0].split("/")[1]
 }
 
+const urlToExchangeData = {
+    assistant: '/assistants',
+    trainer: '/trainers',
+    trainee: '/trainees',
+    category: '/categories',
+    program: '/programs'
+}
+
 export function addDataToTable(rowData, crudContext) {
-    // Send data to server.
-    // On success, add data to the table --> close the modal --> alert success
-    // On failure, alert failure
-    let cloneData = crudContext.state.tableData
-    rowData.markedAs = "just added"
-    cloneData.unshift(rowData)
-    crudContext.setState({ tableData: cloneData, show: false, alertShow: true })
+    const thingToManage = findThingToManage(crudContext.props.match.path)
+    axios.post(urlToExchangeData[thingToManage], rowData)
+        .then(({ data: { _id } }) => {
+            let cloneData = crudContext.state.tableData
+            rowData.markedAs = "just added"
+            rowData._id = _id
+            cloneData.unshift(rowData)
+            crudContext.setState({ tableData: cloneData, show: false, alertShow: true })
+        })
 }
 
 export function editRowInTable(newRowData, crudContext) {
@@ -78,14 +88,8 @@ export function deleteRowInTable(crudContext) {
 export async function fetchData(currentPath) {
     // current path can be one of the following: /assistant-management, /trainer-management, etc.
     const thingToManage = findThingToManage(currentPath)
-    const urlToFetchData = {
-        assistant: '/assistants',
-        trainer: '/trainers',
-        trainee: '/trainees',
-        category: '/categories',
-        program: '/programs'
-    }
-    return await axios.get(urlToFetchData[thingToManage])
+
+    return await axios.get(urlToExchangeData[thingToManage])
 }
 
 export async function fetchListOf(list) {
