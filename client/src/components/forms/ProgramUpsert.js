@@ -3,17 +3,27 @@ import Form from 'react-bootstrap/Form'
 
 import InpGroupList from '../InpGroupList'
 
-import { handleSubmit } from '../../helpers'
-
-import seedData from '../../seedData'
+import { handleSubmit, fetchCategories } from '../../helpers'
 
 class ProgramUpsert extends React.Component {
     state = this.props.editRowData || initialState()
     // may be null if the user hasn't selected any row to edit or hit the create btn
 
+    componentDidMount() {
+        fetchCategories()
+            .then(({ data: categories }) => {
+                let categoryOptions = categories.map((category) =>
+                    <option key={category._id} value={category._id} data-value={JSON.stringify(category)}>{category.name}
+                    </option>)
+                this.setState({ categoryOptions: categoryOptions })
+            })
+    }
+
     onInputChange = (e) => {
         if (!e) return
         const { name, value } = e.target
+        // Because the category is an object, we set its value differently
+        if (name === 'category') return this.setState({category: JSON.parse(e.target.selectedOptions[0].dataset.value)})
         this.setState({ [name]: value })
     }
 
@@ -21,7 +31,7 @@ class ProgramUpsert extends React.Component {
 
     render() {
         const { submitBtn } = this.props
-        const { validated, name, desc, category, sessions } = this.state
+        const { validated, name, desc, category, sessions, categoryOptions } = this.state
 
         return (
             <Form noValidate validated={validated} onSubmit={(e) => handleSubmit(e, this)}>
@@ -39,9 +49,9 @@ class ProgramUpsert extends React.Component {
                 </Form.Group>
                 <Form.Group controlId="formCategory">
                     <Form.Label>Which category does this program belong to?</Form.Label>
-                    <Form.Control required name="category" value={category} as="select" onChange={this.onInputChange}>
+                    <Form.Control required name="category" value={category._id} as="select" onChange={this.onInputChange}>
                         <option value="">Please select the category for the program...</option>
-                        {makeCategories()}
+                        {categoryOptions}
                     </Form.Control>
                     <Form.Control.Feedback type="invalid"> Please select a category </Form.Control.Feedback>
                 </Form.Group>
@@ -55,13 +65,8 @@ class ProgramUpsert extends React.Component {
     }
 }
 
-function makeCategories() {
-    const categories = seedData.category // categories returned from server
-    return categories.map(({ name }, index) => <option key={index}>{name}</option>)
-}
-
 function initialState() {
-    const initial = { name: "", desc: "", category: "", sessions: [] }
+    const initial = { name: "", desc: "", category: {}, sessions: [] }
     return initial
 }
 
