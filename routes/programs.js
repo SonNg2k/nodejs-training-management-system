@@ -4,7 +4,9 @@ const router = require('express').Router(),
     Session = require('../models/Session')
 
 router.get('/', (_req, res, next) => {
-    Program.find({}).populate('sessions', '-programID -__v').select('-__v').lean().exec()
+    Program.find({}).populate('sessions', '-programID -__v')
+        .populate('category', '-desc -__v')
+        .select('-__v').lean().exec()
         .then((data) => res.status(200).json(data))
         .catch(next)
 })
