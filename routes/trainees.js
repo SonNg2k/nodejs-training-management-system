@@ -1,10 +1,10 @@
 const router = require('express').Router(),
-    { authenticate } = require('./utils/authFuncs'),
+    { authUser, authRole } = require('./utils/authFuncs'),
     createError = require('http-errors'),
     User = require('../models/User'),
     Trainee = require('../models/Trainee')
 
-router.get('/', authenticate, (_req, res, next) => {
+router.get('/', authUser, authRole(['assistant']), (_req, res, next) => {
     Trainee.find({})
         .populate('basic_info', 'name email phone dob')
         .populate('assigned_programs', '_id name')
@@ -24,7 +24,7 @@ router.get('/', authenticate, (_req, res, next) => {
         .catch(next)
 })
 
-router.post('/', authenticate, (req, res, next) => {
+router.post('/', authUser, authRole(['assistant']), (req, res, next) => {
     let { body: data } = req
     let user = (({ name, email, password, phone, dob }) => ({ name, email, password, phone, dob }))(data)
     user.role = 'trainee'
@@ -48,7 +48,7 @@ router.post('/', authenticate, (req, res, next) => {
         .catch(next)
 })
 
-router.put('/:id', authenticate, (req, res, next) => {
+router.put('/:id', authUser, authRole(['assistant']), (req, res, next) => {
     let { body: data, params: { id } } = req
     let user = (({ name, email, password, phone, dob }) => ({ name, email, password, phone, dob }))(data)
     user.role = 'trainee'
@@ -65,7 +65,7 @@ router.put('/:id', authenticate, (req, res, next) => {
         .catch(next)
 })
 
-router.delete('/:id', authenticate, (req, res, next) => {
+router.delete('/:id', authUser, authRole(['assistant']), (req, res, next) => {
     let { params: { id } } = req
     Trainee.findByIdAndDelete(id)
         .then(({ basic_info }) =>

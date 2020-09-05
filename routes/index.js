@@ -1,7 +1,7 @@
 const router = require("express").Router(),
     jwt = require('jsonwebtoken'),
     createError = require('http-errors'),
-    { authenticate } = require('./utils/authFuncs'),
+    { authUser, authRole } = require('./utils/authFuncs'),
     User = require('../models/User'),
     Session = require('../models/Session')
 
@@ -21,9 +21,9 @@ router.post("/", (req, res, next) => {
                         trainer: person_id,
                         trainee: person_id
                     }
-                    const payload = { role: user.role, _id: idToAssign[role] }
-                    const token = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1h' })
-                    res.status(200).json({ token: token })
+                    const payload = { role: role, _id: idToAssign[role] }
+                    const token = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '30m' })
+                    res.status(200).json({ role: role, token: token })
                 })
                 .catch(next)
         })
@@ -31,7 +31,7 @@ router.post("/", (req, res, next) => {
 })
 
 // return a list of sessions
-router.get('/sessions', authenticate, (_req, res, next) =>
+router.get('/sessions', authUser, authRole(['admin', 'assistant']), (_req, res, next) =>
     Session.find({}).select('_id name').lean()
         .then((data) => res.status(200).json(data))
         .catch(next)

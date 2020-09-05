@@ -1,10 +1,10 @@
 const router = require('express').Router(),
     createError = require('http-errors'),
-    { authenticate } = require('./utils/authFuncs'),
+    { authUser, authRole } = require('./utils/authFuncs'),
     Program = require('../models/Program'),
     Session = require('../models/Session')
 
-router.get('/', authenticate, (_req, res, next) => {
+router.get('/', authUser, authRole(['assistant']), (_req, res, next) => {
     Program.find({}).populate('sessions', '-programID -__v')
         .populate('category', '-desc -__v')
         .select('-__v').lean().exec()
@@ -12,7 +12,7 @@ router.get('/', authenticate, (_req, res, next) => {
         .catch(next)
 })
 
-router.post('/', authenticate, (req, res, next) => {
+router.post('/', authUser, authRole(['assistant']), (req, res, next) => {
     const { body: data } = req
     let programNoSession = (({ name, desc, category }) => ({ name, desc, category }))(data)
     let { sessions } = data
@@ -21,7 +21,7 @@ router.post('/', authenticate, (req, res, next) => {
         .catch(next)
 })
 
-router.put('/:id', authenticate, (req, res, next) => {
+router.put('/:id', authUser, authRole(['assistant']), (req, res, next) => {
     const { body: data, params: { id } } = req
     let programNoSession = (({ name, desc, category }) => ({ name, desc, category }))(data)
     let { sessions } = data
@@ -38,7 +38,7 @@ router.put('/:id', authenticate, (req, res, next) => {
         .catch(next)
 })
 
-router.delete('/:id', authenticate, (req, res, next) => {
+router.delete('/:id', authUser, authRole(['assistant']), (req, res, next) => {
     let { params: { id } } = req
     Program.findByIdAndDelete(id)
         .then(({ _id: programID }) => {
