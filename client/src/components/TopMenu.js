@@ -5,7 +5,7 @@ import Navbar from 'react-bootstrap/Navbar'
 import Nav from 'react-bootstrap/Nav'
 import Button from 'react-bootstrap/Button'
 
-function TopMenu({ role, showModal }) {
+function TopMenu({ role, showModal, logout }) {
     const profileBtn = role === ("traine_" || "trainee" || "trainer") ? <Button variant="light" className="mr-4"
         onClick={showModal}>Account Profile <i className="fas fa-user"></i></Button> : ""
     const navLinksFor = {
@@ -33,7 +33,7 @@ function TopMenu({ role, showModal }) {
                 </Nav>
                 <Nav>
                     {profileBtn}
-                    <Link to="/signout" className="nav-link"> Sign out <i className="fas fa-sign-out-alt"></i></Link>
+                    <Button variant="primary" onClick={logout}> Logout <i className="fas fa-sign-out-alt"></i></Button>
                 </Nav>
             </Navbar.Collapse>
         </Navbar>
