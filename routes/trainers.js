@@ -6,7 +6,7 @@ const router = require('express').Router(),
 
 router.get('/', authUser, authRole(['admin', 'assistant']), (_req, res, next) => {
     Trainer.find({})
-        .populate('basic_info', 'name email phone dob')
+        .populate('basic_info', 'name email phone dob -_id')
         .populate('assigned_sessions', '_id name') // only _id and session name is enough
         .select('-__v').lean().exec()
         .then((populated) => {

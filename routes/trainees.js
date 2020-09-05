@@ -6,7 +6,7 @@ const router = require('express').Router(),
 
 router.get('/', authUser, authRole(['assistant']), (_req, res, next) => {
     Trainee.find({})
-        .populate('basic_info', 'name email phone dob')
+        .populate('basic_info', 'name email phone dob -_id')
         .populate('assigned_programs', '_id name')
         .select('-__v').lean().exec()
         .then((populated) => {
