@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import ReactDOM from 'react-dom'
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
 import axios from 'axios'
 
 import LoginForm from './LoginForm'
@@ -33,6 +32,7 @@ class LoginControl extends React.Component {
 
     logout = () => {
         localStorage.removeItem('token')
+        window.location.replace("/")
         this.setState({ isLoggedIn: false, role: '' })
     }
 
