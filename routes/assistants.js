@@ -1,22 +1,23 @@
 const router = require('express').Router(),
     createError = require('http-errors'),
+    { authenticate } = require('./utils/authFuncs'),
     User = require('../models/User')
 
-router.get('/', (_req, res, next) => {
+router.get('/', authenticate, (_req, res, next) => {
     User.find({ role: 'assistant' }).select('-role -person_id -password -__v').lean()
         .then((data) => res.status(200).json(data))
         .catch(next)
 })
 
-router.post('/', (req, res, next) => {
+router.post('/', authenticate, (req, res, next) => {
     let { body: assistant } = req
     assistant.role = 'assistant'
     User.create(assistant)
-        .then(({_id: assistantID}) => res.status(201).json({_id: assistantID}))
+        .then(({ _id: assistantID }) => res.status(201).json({ _id: assistantID }))
         .catch(next)
 })
 
-router.put('/:id', async (req, res, next) => {
+router.put('/:id', authenticate, (req, res, next) => {
     let { body: assistant, params: { id } } = req
     assistant.role = 'assistant'
     User.findByIdAndUpdate(id, assistant, { new: true, runValidators: true })
@@ -27,7 +28,7 @@ router.put('/:id', async (req, res, next) => {
         .catch(next)
 })
 
-router.delete('/:id', (req, res, next) => {
+router.delete('/:id', authenticate, (req, res, next) => {
     let { params: { id } } = req
     User.findByIdAndDelete(id)
         .then((found) => {

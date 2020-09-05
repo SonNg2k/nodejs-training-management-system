@@ -1,9 +1,10 @@
 const router = require('express').Router(),
     createError = require('http-errors'),
+    { authenticate } = require('./utils/authFuncs'),
     Program = require('../models/Program'),
     Session = require('../models/Session')
 
-router.get('/', (_req, res, next) => {
+router.get('/', authenticate, (_req, res, next) => {
     Program.find({}).populate('sessions', '-programID -__v')
         .populate('category', '-desc -__v')
         .select('-__v').lean().exec()
@@ -11,7 +12,7 @@ router.get('/', (_req, res, next) => {
         .catch(next)
 })
 
-router.post('/', (req, res, next) => {
+router.post('/', authenticate, (req, res, next) => {
     const { body: data } = req
     let programNoSession = (({ name, desc, category }) => ({ name, desc, category }))(data)
     let { sessions } = data
@@ -20,7 +21,7 @@ router.post('/', (req, res, next) => {
         .catch(next)
 })
 
-router.put('/:id', async (req, res, next) => {
+router.put('/:id', authenticate, (req, res, next) => {
     const { body: data, params: { id } } = req
     let programNoSession = (({ name, desc, category }) => ({ name, desc, category }))(data)
     let { sessions } = data
@@ -37,7 +38,7 @@ router.put('/:id', async (req, res, next) => {
         .catch(next)
 })
 
-router.delete('/:id', (req, res, next) => {
+router.delete('/:id', authenticate, (req, res, next) => {
     let { params: { id } } = req
     Program.findByIdAndDelete(id)
         .then(({ _id: programID }) => {
@@ -59,7 +60,7 @@ function addSessionsToDB(programDoc, sessions, res) {
             clearInterval(timeout)
             programDoc.sessions = sessionIDs
             programDoc.save()
-            res.status(200).json({_id: programID})
+            res.status(200).json({ _id: programID })
         }
     }, 100)
 }

@@ -1,21 +1,22 @@
 const router = require('express').Router(),
     createError = require('http-errors'),
+    { authenticate } = require('./utils/authFuncs'),
     Category = require('../models/Category')
 
-router.get('/', (_req, res, next) => {
+router.get('/', authenticate, (_req, res, next) => {
     Category.find({}).select('-__v').lean()
         .then((data) => res.status(200).json(data))
         .catch(next)
 })
 
-router.post('/', (req, res, next) => {
+router.post('/', authenticate, (req, res, next) => {
     let { body: category } = req
     Category.create(category)
-        .then(({_id: categoryID}) => res.status(201).json({_id: categoryID}))
+        .then(({ _id: categoryID }) => res.status(201).json({ _id: categoryID }))
         .catch(next)
 })
 
-router.put('/:id', async (req, res, next) => {
+router.put('/:id', authenticate, (req, res, next) => {
     let { body: category, params: { id } } = req
     Category.findByIdAndUpdate(id, category, { new: true, runValidators: true })
         .then((found) => {
@@ -25,7 +26,7 @@ router.put('/:id', async (req, res, next) => {
         .catch(next)
 })
 
-router.delete('/:id', (req, res, next) => {
+router.delete('/:id', authenticate, (req, res, next) => {
     let { params: { id } } = req
     Category.findByIdAndDelete(id)
         .then((found) => {

@@ -1,9 +1,10 @@
 const router = require('express').Router(),
+    { authenticate } = require('./utils/authFuncs'),
+    createError = require('http-errors'),
     User = require('../models/User'),
-    Trainee = require('../models/Trainee'),
-    createError = require('http-errors')
+    Trainee = require('../models/Trainee')
 
-router.get('/', (_req, res, next) => {
+router.get('/', authenticate, (_req, res, next) => {
     Trainee.find({})
         .populate('basic_info', 'name email phone dob')
         .populate('assigned_programs', '_id name')
@@ -23,7 +24,7 @@ router.get('/', (_req, res, next) => {
         .catch(next)
 })
 
-router.post('/', (req, res, next) => {
+router.post('/', authenticate, (req, res, next) => {
     let { body: data } = req
     let user = (({ name, email, password, phone, dob }) => ({ name, email, password, phone, dob }))(data)
     user.role = 'trainee'
@@ -37,7 +38,7 @@ router.post('/', (req, res, next) => {
                 .then(({ _id: traineeID }) => {
                     user.person_id = traineeID
                     user.save()
-                    res.status(200).json({_id: traineeID})
+                    res.status(200).json({ _id: traineeID })
                 })
                 .catch((err) => {
                     user.remove() // remove the info associated with the falsy trainee info
@@ -47,7 +48,7 @@ router.post('/', (req, res, next) => {
         .catch(next)
 })
 
-router.put('/:id', (req, res, next) => {
+router.put('/:id', authenticate, (req, res, next) => {
     let { body: data, params: { id } } = req
     let user = (({ name, email, password, phone, dob }) => ({ name, email, password, phone, dob }))(data)
     user.role = 'trainee'
@@ -64,7 +65,7 @@ router.put('/:id', (req, res, next) => {
         .catch(next)
 })
 
-router.delete('/:id', (req, res, next) => {
+router.delete('/:id', authenticate, (req, res, next) => {
     let { params: { id } } = req
     Trainee.findByIdAndDelete(id)
         .then(({ basic_info }) =>
