@@ -6,7 +6,7 @@ const router = require('express').Router(),
 
 router.get('/', authUser, authRole(['admin', 'assistant', 'trainer']), (req, res, next) => {
     const { role, _id } = req.user
-    let findCommand = Trainer.find
+    let findCommand = Trainer.find({})
     if (role === 'trainer') findCommand = Trainer.findById(_id)
     findCommand
         .populate('basic_info', 'name email phone dob -_id')
@@ -53,13 +53,19 @@ router.post('/', authUser, authRole(['admin', 'assistant']), (req, res, next) =>
         .catch(next)
 })
 
-router.put('/:id', authUser, authRole(['admin', 'assistant']), (req, res, next) => {
+// A logged in trainer can send the JWT to this route to update the profile
+router.put(['/', '/:id'], authUser, authRole(['admin', 'assistant', 'trainer']), (req, res, next) => {
+    const { role, _id } = req.user
     let { body: data, params: { id } } = req
+    if (role === 'trainer') id = _id
+
     let user = (({ name, email, password, phone, dob }) => ({ name, email, password, phone, dob }))(data)
     user.role = 'trainer'
     if (!user.password) delete user.password
 
     let trainerOnly = (({ type, working_place, assigned_sessions }) => ({ type, working_place, assigned_sessions }))(data)
+    if (role === 'trainer') delete trainerOnly.assigned_sessions // trainer is not allowed to update his/her sessions
+
     Trainer.findByIdAndUpdate(id, trainerOnly, { new: true, runValidators: true })
         .then((trainer) => {
             if (!trainer) return next(createError.NotFound('There is no user with the given ID'))
