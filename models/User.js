@@ -58,7 +58,7 @@ UserSchema.pre('findOneAndUpdate', function (next) {
     else next()
 })
 
-UserSchema.methods.isCorrectPassword = (plainPassword) => bcrypt.compare(plainPassword, this.password)
+UserSchema.methods.isCorrectPassword = function (plainPassword) { return bcrypt.compare(plainPassword, this.password) }
 // Either return a resolved promise with the boolean value (true if the pass does match and vice versa)
 // or a rejected promise with an Error
 
