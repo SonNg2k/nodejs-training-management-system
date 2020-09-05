@@ -69,21 +69,28 @@ module.exports = function seedDB() {
     categories.forEach((category) => Category.create(category))
 
     programs.forEach((program) => {
+        let programNoSession = (({ name, desc, category }) => ({ name, desc, category }))(program)
         let { sessions } = program
-        let sessionIDs = [] // wait until sessionIDs.length === sessions.length?
-        sessions.forEach((session) => Session.create(session).then(({ _id: sessionID }) => sessionIDs.push(sessionID)))
-
-        let timeout = setInterval(() => {
-            if (sessionIDs.length === sessions.length) { // check if all the sessions has been added to the DB
-                clearInterval(timeout)
-                program.sessions = sessionIDs
-                Program.create(program)
-            }
-        }, 100)
+        Program.create(programNoSession)
+            .then((programDoc) => {
+                const { _id: programID } = programDoc
+                let sessionIDs = []
+                sessions.forEach((session) => {
+                    session.programID = programID
+                    Session.create(session).then(({ _id: sessionID }) => sessionIDs.push(sessionID))
+                })
+                let timeout = setInterval(() => {
+                    if (sessionIDs.length === sessions.length) { // check if all the sessions has been added to the DB
+                        clearInterval(timeout)
+                        programDoc.sessions = sessionIDs
+                        programDoc.save()
+                    }
+                }, 100)
+            })
     })
 
     assistants.forEach((assistant) => {
-        assistant.role= 'assistant'
+        assistant.role = 'assistant'
         User.create(assistant)
     })
 
