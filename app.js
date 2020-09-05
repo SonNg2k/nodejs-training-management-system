@@ -1,4 +1,5 @@
 const express = require('express');
+const path = require('path');
 const mongoose = require('mongoose');
 const createError = require('http-errors')
 
@@ -17,6 +18,7 @@ connection.once('open', () => {
 })
 // seedDB()
 
+app.use(express.static(path.resolve(__dirname, './client/build')))
 app.use(express.json());
 app.use((req, res, next) => { // make "/path" and "/path/" to be the same
   const test = /\?[^]*\//.test(req.url);
@@ -30,6 +32,7 @@ app.disable('x-powered-by'); // NOT reveal the technology of server (Express.js)
 //requiring routes
 var routes = require('./routes')
 app.use("/", routes);
+app.get('*', (_req, res) => res.sendFile(path.resolve(__dirname, './client/build', 'index.html')));
 app.all("*", (req, _res, next) => {
   next(new createError.NotFound(`Page not found. ${req.ip} tried to reach ${req.originalUrl}`))
 })
