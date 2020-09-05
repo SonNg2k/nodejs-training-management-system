@@ -6,7 +6,7 @@ const router = require('express').Router(),
 
 router.get('/', authUser, authRole(['assistant', 'trainee']), (req, res, next) => {
     const { role, _id } = req.user
-    let findCommand = Trainee.find
+    let findCommand = Trainee.find({})
     if (role === 'trainee') findCommand = Trainee.findById(_id)
     findCommand
         .populate('basic_info', 'name email phone dob -_id')
@@ -53,13 +53,19 @@ router.post('/', authUser, authRole(['assistant']), (req, res, next) => {
         .catch(next)
 })
 
-router.put('/:id', authUser, authRole(['assistant']), (req, res, next) => {
+// A logged in trainee can send his/her JWT to this route to update the profile
+router.put(['/', '/:id'], authUser, authRole(['assistant', 'trainee']), (req, res, next) => {
+    const { role, _id } = req.user
     let { body: data, params: { id } } = req
+    if (role === 'trainee') id = _id
+
     let user = (({ name, email, password, phone, dob }) => ({ name, email, password, phone, dob }))(data)
     user.role = 'trainee'
     if (!user.password) delete user.password
 
     let traineeOnly = (({ education, department, assigned_programs }) => ({ education, department, assigned_programs }))(data)
+    if (role === 'trainee') delete traineeOnly.assigned_programs // trainee is not allowed to update his/her programs
+
     Trainee.findByIdAndUpdate(id, traineeOnly, { new: true, runValidators: true })
         .then((trainee) => {
             if (!trainee) return next(createError.NotFound('There is no user with the given ID'))
