@@ -1,12 +1,12 @@
 const router = require("express").Router(),
     jwt = require('jsonwebtoken'),
     createError = require('http-errors'),
-    { authUser, authRole } = require('./utils/authFuncs'),
+    { authUser, authRole, authAdmin } = require('./utils/authFuncs'),
     User = require('../models/User'),
     Session = require('../models/Session')
 
 // User must enter the login credentials at root / so that they can gain access
-router.post("/", (req, res, next) => {
+router.post("/", authAdmin, (req, res, next) => {
     const { body: { email, password } } = req
     const loginError = createError.Unauthorized('Invalid login credentials')
     User.find({ email: email })
