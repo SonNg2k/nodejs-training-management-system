@@ -64,7 +64,7 @@ export class CategoryUpsert extends React.Component {
 }
 
 // The table below is used to render a list of sessions/programs. Each item in the list is an object with the 'name' and 'desc' keys
-export function ViewTable({ tableData, pageFor }) {
+export function ViewTable({ tableData, role }) {
     const obj = {
         trainer: 'session',
         trainee: 'program'
@@ -75,8 +75,8 @@ export function ViewTable({ tableData, pageFor }) {
                 <thead>
                     <tr>
                         <th>#</th>
-                        <th>The {obj[pageFor]} assigned to you</th>
-                        <th>{obj[pageFor]} description</th>
+                        <th>The {obj[role]} assigned to you</th>
+                        <th>{obj[role]} description</th>
                     </tr>
                 </thead>
                 <tbody>

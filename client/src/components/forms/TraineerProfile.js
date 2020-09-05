@@ -17,18 +17,18 @@ class TraineerProfile extends React.Component {
     }
 
     render() {
-        const { pageFor } = this.props
+        const { role } = this.props
         const uniqueFields = {
             trainer: TrainerUniqueFields,
             trainee: TraineeUniqueFields
         }
-        const UniqueFields = uniqueFields[pageFor]
+        const UniqueFields = uniqueFields[role]
 
         return (
             <Form noValidate validated={this.state.validated} onSubmit={(e) => handleSubmit(e, this)}>
                 <UserBasicFields parentState={this.state} onInputChange={this.onInputChange} btnToShow='editBtn' />
                 <UniqueFields parentState={this.state} onInputChange={this.onInputChange} />
-                <EditBtn text={`Update your ${pageFor}  profile`} className="center" />
+                <EditBtn text={`Update your ${role}  profile`} className="center" />
             </Form>
         )
     }

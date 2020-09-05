@@ -6,7 +6,7 @@ import TopMenu from './TopMenu'
 import { ViewTable } from './myReusable'
 import TraineerProfile from './forms/TraineerProfile'
 
-function TraineerLayout({ pageFor }) {
+function TraineerLayout({ role }) {
     const [show, setShow] = useState(false)
 
     const showModal = () => setShow(true)
@@ -34,25 +34,25 @@ function TraineerLayout({ pageFor }) {
 
     const profileData = {
         trainer: (({ name, email, phone, dob, type, working_place }) =>
-            ({ name, email, phone, dob, type, working_place }))(seedData[pageFor]),
+            ({ name, email, phone, dob, type, working_place }))(seedData[role]),
         trainee: (({ name, email, phone, dob, education, department }) =>
-            ({ name, email, phone, dob, education, department }))(seedData[pageFor])
+            ({ name, email, phone, dob, education, department }))(seedData[role])
     }
-    const profile = profileData[pageFor]
+    const profile = profileData[role]
 
     const listData = {
         trainer: seedData.trainer.assigned_sessions,
         trainee: seedData.trainee.assigned_programs
     }
-    const tableData = listData[pageFor]
+    const tableData = listData[role]
 
     return (
         <>
             <TopMenu role="traine_" showModal={showModal} />
-            <UpsertModal show={show} closeModal={closeModal} title={`Here is your ${pageFor} profile`}>
-                <TraineerProfile closeModal={closeModal} profile={profile} pageFor={pageFor}/>
+            <UpsertModal show={show} closeModal={closeModal} title={`Here is your ${role} profile`}>
+                <TraineerProfile closeModal={closeModal} profile={profile} role={role}/>
             </UpsertModal>
-            <ViewTable tableData={tableData} pageFor={pageFor}/>
+            <ViewTable tableData={tableData} role={role}/>
         </>
     )
 }
