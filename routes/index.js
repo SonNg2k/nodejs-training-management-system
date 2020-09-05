@@ -22,7 +22,7 @@ router.post("/", authAdmin, (req, res, next) => {
                         trainee: person_id
                     }
                     const payload = { role: role, _id: idToAssign[role] }
-                    const token = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '30m' })
+                    const token = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1h' })
                     res.status(200).json({ role: role, token: token })
                 })
                 .catch(next)
