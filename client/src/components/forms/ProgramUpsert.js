@@ -23,7 +23,7 @@ class ProgramUpsert extends React.Component {
         if (!e) return
         const { name, value } = e.target
         // Because the category is an object, we set its value differently
-        if (name === 'category') return this.setState({category: JSON.parse(e.target.selectedOptions[0].dataset.value)})
+        if (name === 'category') return this.setState({ category: JSON.parse(e.target.selectedOptions[0].dataset.value) })
         this.setState({ [name]: value })
     }
 
@@ -49,7 +49,8 @@ class ProgramUpsert extends React.Component {
                 </Form.Group>
                 <Form.Group controlId="formCategory">
                     <Form.Label>Which category does this program belong to?</Form.Label>
-                    <Form.Control required name="category" value={category._id} as="select" onChange={this.onInputChange}>
+                    <Form.Control required name="category" value={category && category._id} as="select"
+                        onChange={this.onInputChange}>
                         <option value="">Please select the category for the program...</option>
                         {categoryOptions}
                     </Form.Control>
