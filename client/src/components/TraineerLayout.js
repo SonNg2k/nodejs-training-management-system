@@ -1,4 +1,5 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import axios from 'axios'
 
 import { UpsertModal } from './myReusable'
 import TopMenu from './TopMenu'
@@ -6,55 +7,50 @@ import TopMenu from './TopMenu'
 import { ViewTable } from './myReusable'
 import TraineerProfile from './forms/TraineerProfile'
 
-function TraineerLayout({ role }) {
+function TraineerLayout({ role, logout }) {
     const [show, setShow] = useState(false)
+    const [profile, setProfile] = useState(initialProfile(role))
+    const [tableData, setTableData] = useState([])
 
     const showModal = () => setShow(true)
     const closeModal = () => setShow(false)
 
     // All info about a particular trainer/trainee is centralized here and distributed to children components
-    const seedData = { // data from server
-        trainer: {
-            name: "Steve Jobs", email: "sadas@sad.com", phone: "129308", dob: new Date(), type: "internal",
-            working_place: "FPT Ninh Kieu Dist",
-            assigned_sessions: [
-                { name: "State in React Components", desc: 'none' },
-                { name: 'React Hooks', desc: 'none' }
-            ]
-        },
-        trainee: {
-            name: "Steve Balmer", email: "asdiue@sad.com", phone: "3457765", dob: new Date(),
-            education: "Doctoral or Professional Degree", department: "IT",
-            assigned_programs: [
-                { name: "React + Redux", desc: 'none' },
-                { name: 'Nodejs web dev', desc: 'none' }
-            ]
-        }
-    }
-
-    const profileData = {
-        trainer: (({ name, email, phone, dob, type, working_place }) =>
-            ({ name, email, phone, dob, type, working_place }))(seedData[role]),
-        trainee: (({ name, email, phone, dob, education, department }) =>
-            ({ name, email, phone, dob, education, department }))(seedData[role])
-    }
-    const profile = profileData[role]
-
-    const listData = {
-        trainer: seedData.trainer.assigned_sessions,
-        trainee: seedData.trainee.assigned_programs
-    }
-    const tableData = listData[role]
+    useEffect(() => { // fetch initial data for trainer/trainee
+        axios.get(`/${role}s`)
+            .then(({ data }) => {
+                const profileData = {
+                    trainer: (({ name, email, phone, dob, type, working_place }) =>
+                        ({ name, email, phone, dob, type, working_place }))(data),
+                    trainee: (({ name, email, phone, dob, education, department }) =>
+                        ({ name, email, phone, dob, education, department }))(data)
+                }
+                const tableData = {
+                    trainer: data.assigned_sessions,
+                    trainee: data.assigned_programs
+                }
+                setTableData(tableData[role])
+                setProfile(profileData[role])
+            })
+    }, [])
 
     return (
         <>
-            <TopMenu role="traine_" showModal={showModal} />
+            <TopMenu role="traine_" showModal={showModal} logout={logout} />
             <UpsertModal show={show} closeModal={closeModal} title={`Here is your ${role} profile`}>
-                <TraineerProfile closeModal={closeModal} profile={profile} role={role}/>
+                <TraineerProfile closeModal={closeModal} profile={profile} role={role} />
             </UpsertModal>
-            <ViewTable tableData={tableData} role={role}/>
+            <ViewTable tableData={tableData} role={role} />
         </>
     )
 }
 
 export default TraineerLayout
+
+function initialProfile(role) {
+    const obj = {
+        trainer: { name: "", email: "", phone: "", dob: null, type: "", working_place: "" },
+        trainee: { name: "", email: "", phone: "", dob: null, education: "", department: "" }
+    }
+    return obj[role]
+}
