@@ -1,19 +1,20 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 
-import { UpsertModal } from './myReusable'
 import TopMenu from './TopMenu'
-
-import { ViewTable } from './myReusable'
+import { ViewTable, UpsertModal, AlertBoard } from './myReusable'
 import TraineerProfile from './forms/TraineerProfile'
 
 function TraineerLayout({ role, logout }) {
+    const [alertShow, displayAlert] = useState(false)
     const [show, setShow] = useState(false)
     const [profile, setProfile] = useState(initialProfile(role))
     const [tableData, setTableData] = useState([])
 
     const showModal = () => setShow(true)
     const closeModal = () => setShow(false)
+    const showAlert = () => displayAlert(true)
+    const closeAlert = () => displayAlert(false)
 
     // All info about a particular trainer/trainee is centralized here and distributed to children components
     useEffect(() => { // fetch initial data for trainer/trainee
@@ -32,15 +33,17 @@ function TraineerLayout({ role, logout }) {
                 setTableData(tableData[role])
                 setProfile(profileData[role])
             })
-    }, [])
+    }, [alertShow])
 
     return (
         <>
             <TopMenu role="traine_" showModal={showModal} logout={logout} />
             <UpsertModal show={show} closeModal={closeModal} title={`Here is your ${role} profile`}>
-                <TraineerProfile closeModal={closeModal} profile={profile} role={role} />
+                <TraineerProfile closeModal={closeModal} profile={profile} role={role} showAlert={showAlert} />
             </UpsertModal>
             <ViewTable tableData={tableData} role={role} />
+            <AlertBoard closeAlert={closeAlert} alertShow={alertShow} msg='Profile is updated successfully, yay ✅'
+                bkgColor='success' />
         </>
     )
 }
