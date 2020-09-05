@@ -4,12 +4,16 @@ const router = require('express').Router(),
     User = require('../models/User'),
     Trainee = require('../models/Trainee')
 
-router.get('/', authUser, authRole(['assistant']), (_req, res, next) => {
-    Trainee.find({})
+router.get('/', authUser, authRole(['assistant', 'trainee']), (req, res, next) => {
+    const { role, _id } = req.user
+    let findCommand = Trainee.find
+    if (role === 'trainee') findCommand = Trainee.findById(_id)
+    findCommand
         .populate('basic_info', 'name email phone dob -_id')
         .populate('assigned_programs', '_id name')
         .select('-__v').lean().exec()
         .then((populated) => {
+            if (!Array.isArray(populated)) populated = [populated]
             populated = populated.map((doc) => {
                 const { _id: id, education, department, assigned_programs } = doc
                 const basic_info = doc.basic_info
@@ -19,6 +23,7 @@ router.get('/', authUser, authRole(['assistant']), (_req, res, next) => {
                 }
                 return newDoc
             })
+            if (role === 'trainee') populated = populated[0]
             res.status(200).json(populated)
         })
         .catch(next)
