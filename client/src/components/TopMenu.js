@@ -25,7 +25,7 @@ function TopMenu({ role, showModal, logout }) {
     }
     return (
         <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark">
-            <Link to="/homepage" className="navbar-brand"> Logo </Link>
+            <Navbar.Brand href="#">Logo</Navbar.Brand>
             <Navbar.Toggle aria-controls="responsive-navbar-nav" />
             <Navbar.Collapse id="responsive-navbar-nav">
                 <Nav className="mr-auto">
