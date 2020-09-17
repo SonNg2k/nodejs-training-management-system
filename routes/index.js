@@ -27,7 +27,7 @@ router.post("/", authAdmin, (req, res, next) => {
                 })
                 .catch(next)
         })
-        .catch()
+        .catch(next)
 })
 
 // return a list of sessions
