@@ -15,3 +15,9 @@ to test if the app works smoothly.
 |                    	| trainee2@gmail.com   	| trainee2   	|
 
 Here is how it works. There is only one default admin account in the system. The admin can create trainer and training assistant accounts. The training assistant can create trainer and trainee accounts.
+
+Here is my planning diagram for this web app: 
+
+<img src="https://raw.githubusercontent.com/SonXuanNguyen2k/nodejs-training-management-system/master/Planning.jpg"
+     alt="Planning"
+     style="float: left; margin-right: 10px;" />
