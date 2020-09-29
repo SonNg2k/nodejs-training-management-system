@@ -1,5 +1,6 @@
 # nodejs-training-management-system
-A role-based 🔐 access control single-page React app 🌐 developed using the MERN stack (MongoDB, Express.js, Reactjs, and Nodejs). This is a training management system that encompasses four roles : admin, training assistant, trainer, and trainee.
+
+**First and foremost, please be patient and wait for my web app to load since it will automatically go to sleep after 30 minutes of no ingress traffic (due to my chosen free pricing plan provisioned by the Heroku platform)**
 
 The login credentials for different users with different roles are listed below, they can be used
 to test if the app works smoothly.
@@ -14,7 +15,7 @@ to test if the app works smoothly.
 | Trainee            	| trainee1@gmail.com   	| trainee1   	|
 |                    	| trainee2@gmail.com   	| trainee2   	|
 
-Here is how it works. There is only one default admin account in the system. The admin can create trainer and training assistant accounts. The training assistant can create trainer and trainee accounts.
+Here is how it works. There is only one default admin account in the system. The admin is allowed to create trainer and training assistant accounts. The training assistant is permitted to create trainer and trainee accounts.
 
 Here is my planning diagram for this web app: 
 
