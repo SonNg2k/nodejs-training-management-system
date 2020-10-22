@@ -1,0 +1,34 @@
+.center {
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.right-aligned {
+    float: right
+}
+
+.center-children {
+    display: flex;
+    justify-content: center;
+}
+
+.added-row-background {
+    background-color: #FFEFD5 !important;
+}
+
+.edited-row-background {
+    background-color: #98FB98 !important;
+}
+
+.new-line {
+    white-space: pre-line;
+}
+
+[role='alert'] {
+    position: fixed !important;
+    top: 10px;
+    height: 55px;
+    z-index: 2000;
+    display: inline-block;
+}
