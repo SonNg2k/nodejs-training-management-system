@@ -27,8 +27,8 @@ const setup = (app) => {
 
 
 const initRoutes = (app) => {
-    const routes = require('../routes')
-    app.use("/", routes);
+    const routers = require('../routers')
+    app.use("/", routers);
     app.get('*', (_req, res) => res.sendFile(path.resolve(__dirname, './client/build', 'index.html')));
     app.all("*", (req, _res, next) => {
         next(new createError.NotFound(`Page not found. ${req.ip} tried to reach ${req.originalUrl}`))
